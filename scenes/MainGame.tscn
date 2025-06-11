@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://b3o2mk01dk6si"]
+
+[ext_resource type="Script" uid="uid://bortwy4x8m6bg" path="res://scripts/GameManager.gd" id="1_p73vr"]
+[ext_resource type="Script" uid="uid://cdp2f6eebikh6" path="res://scripts/ThreeLaneField.gd" id="2_t4bxf"]
+[ext_resource type="Script" uid="uid://bjudi7hujnuod" path="res://scripts/PlayerController.gd" id="3_x628s"]
+
+[node name="MainGame" type="Node3D"]
+script = ExtResource("1_p73vr")
+
+[node name="ThreeLaneField" type="Node3D" parent="."]
+script = ExtResource("2_t4bxf")
+
+[node name="Player" type="CharacterBody3D" parent="."]
+script = ExtResource("3_x628s")
+
+[node name="CameraPivot" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 8, -6)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, 0.353553, -0.353553, 0, 0.707107, 0.707107, 0.5, -0.612372, 0.612372, 0, 10, 0)

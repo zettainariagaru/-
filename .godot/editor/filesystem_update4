@@ -1,0 +1,11 @@
+res://Main2D.tscn
+res://MonsterSlammer.tscn
+res://scenes/GameScene.tscn
+res://scenes/Game.tscn
+res://scenes/Main.tscn
+res://scripts/Enemy.gd
+res://scripts/Player.gd
+res://scripts/EnemyManager.gd
+res://scripts/GameManager.gd
+res://scripts/UI.gd
+res://scripts/LaneManager.gd

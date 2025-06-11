@@ -1,0 +1,30 @@
+[gd_scene load_steps=6 format=3 uid="uid://c0jyvqnle44ba"]
+
+[ext_resource type="Script" uid="uid://cg02a5ee0cyn0" path="res://scripts/LaneManager.gd" id="1_vcsgt"]
+[ext_resource type="Script" uid="uid://dtns2bhvjnri2" path="res://scripts/Player.gd" id="2_c01mt"]
+[ext_resource type="Script" uid="uid://dr3s6ykpof86m" path="res://scripts/EnemyManager.gd" id="3_nxtc6"]
+[ext_resource type="Script" uid="uid://bhyt5urd6aaub" path="res://scripts/UI.gd" id="4_jlsqs"]
+[ext_resource type="Script" uid="uid://bortwy4x8m6bg" path="res://scripts/GameManager.gd" id="5_q8u5g"]
+
+[node name="Main" type="Node2D"]
+
+[node name="Game" type="Node2D" parent="."]
+
+[node name="Lanes" type="Node2D" parent="Game"]
+script = ExtResource("1_vcsgt")
+
+[node name="Player" type="CharacterBody2D" parent="Game"]
+position = Vector2(128, 200)
+script = ExtResource("2_c01mt")
+
+[node name="Enemies" type="Node2D" parent="Game"]
+script = ExtResource("3_nxtc6")
+
+[node name="Camera" type="Camera2D" parent="Game"]
+position = Vector2(640, 280)
+
+[node name="UI" type="CanvasLayer" parent="."]
+script = ExtResource("4_jlsqs")
+
+[node name="GameManager" type="Node" parent="."]
+script = ExtResource("5_q8u5g")

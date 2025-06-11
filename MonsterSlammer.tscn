@@ -1,0 +1,79 @@
+[gd_scene load_steps=8 format=3 uid="uid://cek3vgj84hgsh"]
+
+[ext_resource type="Script" uid="uid://bp446prg53iiv" path="res://scripts/FieldManager.gd" id="1_nhfjh"]
+[ext_resource type="Script" uid="uid://dtns2bhvjnri2" path="res://scripts/Player.gd" id="2_ou3pq"]
+[ext_resource type="Script" uid="uid://fbpllyelcfs4" path="res://scripts/Monster.gd" id="3_p3tdv"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tlx1v"]
+size = Vector2(40, 40)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hqujn"]
+radius = 15.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_gmlo5"]
+radius = 15.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_gs7vs"]
+radius = 15.0
+
+[node name="MonsterSlammer" type="Node2D"]
+
+[node name="FieldManager" type="Node2D" parent="."]
+script = ExtResource("1_nhfjh")
+
+[node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(100, 0)
+script = ExtResource("2_ou3pq")
+
+[node name="PlayerSprite" type="ColorRect" parent="Player"]
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+color = Color(0, 0, 1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("RectangleShape2D_tlx1v")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+
+[node name="Monsters" type="Node2D" parent="."]
+
+[node name="Monster1" type="RigidBody2D" parent="Monsters"]
+position = Vector2(200, -96)
+script = ExtResource("3_p3tdv")
+
+[node name="MonsterSprite" type="ColorRect" parent="Monsters/Monster1"]
+offset_left = -15.0
+offset_top = -15.0
+offset_right = 15.0
+offset_bottom = 15.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Monsters/Monster1"]
+shape = SubResource("CircleShape2D_hqujn")
+
+[node name="Monster2" type="RigidBody2D" parent="Monsters"]
+position = Vector2(350, 0)
+script = ExtResource("3_p3tdv")
+
+[node name="MonsterSprite" type="ColorRect" parent="Monsters/Monster2"]
+offset_left = -15.0
+offset_top = -15.0
+offset_right = 15.0
+offset_bottom = 15.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Monsters/Monster2"]
+shape = SubResource("CircleShape2D_gmlo5")
+
+[node name="Monster3" type="RigidBody2D" parent="Monsters"]
+position = Vector2(500, 96)
+script = ExtResource("3_p3tdv")
+
+[node name="MonsterSprite" type="ColorRect" parent="Monsters/Monster3"]
+offset_left = -15.0
+offset_top = -15.0
+offset_right = 15.0
+offset_bottom = 15.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Monsters/Monster3"]
+shape = SubResource("CircleShape2D_gs7vs")
