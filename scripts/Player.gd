@@ -85,7 +85,8 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func _handle_tile_based_movement(delta: float) -> void:
-	var input_vector = Vector2i.ZERO
+        var input_vector = Vector2i.ZERO
+        velocity = Vector2.ZERO
 	
 	# 入力を取得（移動中でなく、クールダウンが終わっている場合のみ）
 	if not is_moving and move_cooldown <= 0:
@@ -141,9 +142,9 @@ func _handle_free_movement(delta: float) -> void:
 
 func _update_aim(delta: float) -> void:
 	# マウスまたは右スティックで狙いを定める
-	var mouse_pos = get_global_mouse_position()
-	var target_direction = (mouse_pos - global_position).normalized()
-	aim_direction = aim_direction.lerp(target_direction, aim_rotation_speed * delta)
+        var mouse_pos = get_global_mouse_position()
+        var target_direction = (mouse_pos - global_position).normalized()
+        aim_direction = aim_direction.lerp(target_direction, aim_rotation_speed * delta).normalized()
 
 func _update_throw_guide() -> void:
 	if carried_monsters.is_empty():
@@ -154,20 +155,17 @@ func _update_throw_guide() -> void:
 	throw_guide.clear_points()
 	
 	# 投擲軌道の計算
-	var points: Array[Vector2] = []
-	var start_pos = Vector2.ZERO
-	var velocity = aim_direction * throw_power
-	var gravity = 980.0 # 重力加速度
-	var time_step = 0.05
-	
-	for i in range(20): # 20ポイントで軌道を表示
-		var t = i * time_step
-		var x = velocity.x * t
-		var y = velocity.y * t + 0.5 * gravity * t * t
-		points.append(Vector2(x, y))
-		
-		if points[i].length() > max_throw_distance:
-			break
+        var points: Array[Vector2] = []
+        var velocity = aim_direction * throw_power
+        var gravity = 980.0 # 重力加速度
+        var time_step = 0.05
+
+        for i in range(20):
+                var t = i * time_step
+                var pos = Vector2(velocity.x * t, velocity.y * t + 0.5 * gravity * t * t)
+                if pos.length() > max_throw_distance:
+                        break
+                points.append(pos)
 	
 	throw_guide.points = points
 
@@ -190,7 +188,8 @@ func _throw_monster() -> void:
 		return
 	
 	var monster_data = carried_monsters.pop_back()
-	var thrown_position = global_position + aim_direction * 50
+        var dir := aim_direction.normalized()
+        var thrown_position = global_position + dir * 50
 	
 	# EventBusを通じて投擲イベントを発信
 	if has_node("/root/EventBus"):
@@ -200,9 +199,9 @@ func _throw_monster() -> void:
 	# 投擲物の生成（ObjectPoolsを使用）
 	if has_node("/root/ObjectPools"):
 		var object_pools = get_node("/root/ObjectPools")
-		var projectile = object_pools.get_projectile("thrown_monster")
-		if projectile:
-			projectile.setup(monster_data, thrown_position, aim_direction * throw_power)
+                var projectile = object_pools.get_projectile("thrown_monster")
+                if projectile:
+                        projectile.setup(monster_data, thrown_position, dir * throw_power)
 			get_tree().current_scene.get_node("Field/YSort/ThrownObjects").add_child(projectile)
 	
 	_update_carry_stack_display()
