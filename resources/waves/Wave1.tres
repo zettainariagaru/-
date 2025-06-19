@@ -1,0 +1,4 @@
+[gd_resource type="Resource" format=3 uid="uid://cli2yhxj8xo7u"]
+
+[resource]
+script = "res://scripts/resources/WaveData.gd"

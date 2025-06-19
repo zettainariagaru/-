@@ -17,10 +17,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-TileSystem={
-"name": "TileSystem",
-"path": "res://scripts/autoload/TileSystem.gd"
-}
+EventBus="*res://singletons/EventBus.tscn"
+ObjectPools="*res://singletons/ObjectPools.tscn"
 
 [display]
 

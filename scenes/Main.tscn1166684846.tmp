@@ -1,0 +1,54 @@
+[gd_scene load_steps=4 format=3 uid="uid://c0jyvqnle44ba"]
+
+[ext_resource type="Script" uid="uid://bortwy4x8m6bg" path="res://scripts/GameManager.gd" id="5_q8u5g"]
+[ext_resource type="Script" uid="uid://cay7ate5t1cr0" path="res://scripts/UIManager.gd" id="6_jlsqs"]
+[ext_resource type="Script" uid="uid://b533nf5qi3aw1" path="res://scripts/Spawner.gd" id="7_q8u5g"]
+
+[node name="Main" type="Node2D"]
+
+[node name="GameManager" type="Node" parent="."]
+script = ExtResource("5_q8u5g")
+
+[node name="UIManager" type="CanvasLayer" parent="."]
+script = ExtResource("6_jlsqs")
+
+[node name="HUD" type="Control" parent="UIManager"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="StackUI" type="Control" parent="UIManager"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="ComboVFX" type="Control" parent="UIManager"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="PauseMenu" type="Control" parent="UIManager"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Field" type="Node2D" parent="."]
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="Field"]
+
+[node name="TileMap" type="TileMap" parent="Field"]
+format = 2
+
+[node name="YSort" type="Node2D" parent="Field"]
+y_sort_enabled = true
+
+[node name="Gimmicks" type="Node2D" parent="Field/YSort"]
+
+[node name="Entities" type="Node2D" parent="Field/YSort"]
+
+[node name="ThrownObjects" type="Node2D" parent="Field/YSort"]
+
+[node name="Spawner" type="Node" parent="Field"]
+script = ExtResource("7_q8u5g")
+
+[node name="CameraRig" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="CameraRig"]
+
+[node name="AudioBusManager" type="Node" parent="."]

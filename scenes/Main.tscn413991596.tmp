@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://c0jyvqnle44ba"]
+
+[node name="Main" type="Node2D"]
+
+[node name="GameManager" type="Node" parent="."]
+
+[node name="UIManager" type="CanvasLayer" parent="."]
+
+[node name="HUD" type="Control" parent="UIManager"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="StackUI" type="Control" parent="UIManager"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="ComboVFX" type="Control" parent="UIManager"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="PauseMenu" type="Control" parent="UIManager"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Field" type="Node2D" parent="."]
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="Field"]
+
+[node name="TileMap" type="TileMap" parent="Field"]
+format = 2
+
+[node name="YSort" type="Node2D" parent="Field"]
+y_sort_enabled = true
+
+[node name="Gimmicks" type="Node2D" parent="Field/YSort"]
+
+[node name="Entities" type="Node2D" parent="Field/YSort"]
+
+[node name="ThrownObjects" type="Node2D" parent="Field/YSort"]
+
+[node name="Spawner" type="Node" parent="Field"]
+
+[node name="CameraRig" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="CameraRig"]
+
+[node name="AudioBusManager" type="Node" parent="."]

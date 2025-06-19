@@ -1,0 +1,4 @@
+[gd_resource type="Resource" format=3 uid="uid://t0ygudxdv5x1"]
+
+[resource]
+script = "res://scripts/MonsterData.gd"

@@ -1,0 +1,220 @@
+[gd_scene load_steps=30 format=3 uid="uid://ckb4r4oywxog1"]
+
+[ext_resource type="Script" uid="uid://dtns2bhvjnri2" path="res://scripts/Player.gd" id="1_p0vlq"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_v6fml"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_3li8b"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_mdl7e"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_qu4a1"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_70d11"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_cw2d6"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_khinc"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bruh7"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_6eyey"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_d3wef"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_o4126"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_lkdrv"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_p7iby"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_0rnld"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_srp4u"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_jfpux"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_61ith"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_ebwui"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sfy4j"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_gv3ic"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_b8lor"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_6e537"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_p07f3"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_viqgg"]
+size = Vector2(64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_fgkxt"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_v6fml")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_3li8b")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_mdl7e")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_qu4a1")
+}],
+"loop": true,
+"name": &"charge",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_70d11")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_cw2d6")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_khinc")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_bruh7")
+}],
+"loop": true,
+"name": &"death",
+"speed": 10.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_6eyey")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_d3wef")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_o4126")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_lkdrv")
+}],
+"loop": true,
+"name": &"hurt",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_p7iby")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_0rnld")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_srp4u")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_jfpux")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_61ith")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_ebwui")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_sfy4j")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_gv3ic")
+}],
+"loop": true,
+"name": &"throw",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_b8lor")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_6e537")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_p07f3")
+}, {
+"duration": 1.0,
+"texture": SubResource("PlaceholderTexture2D_viqgg")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 10.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xsi7p"]
+radius = 16.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1jpwa"]
+radius = 40.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_pfeki"]
+radius = 20.0
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_p0vlq")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_fgkxt")
+animation = &"idle"
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_xsi7p")
+
+[node name="StateMachine" type="Node" parent="."]
+
+[node name="CarryStack" type="Node2D" parent="."]
+
+[node name="ThrowGuide" type="Line2D" parent="."]
+
+[node name="PickRange" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickRange"]
+shape = SubResource("CircleShape2D_1jpwa")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_pfeki")

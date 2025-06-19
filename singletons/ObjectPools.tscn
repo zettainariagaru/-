@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://btbsc8yi7ywmj"]
+
+[ext_resource type="Script" uid="uid://ba0bpepdy6oyo" path="res://singletons/ObjectPools.gd" id="1_xtbnk"]
+
+[node name="ObjectPools" type="Node"]
+script = ExtResource("1_xtbnk")
+
+[node name="VfxPool" type="Node" parent="."]
+
+[node name="ProjectilePool" type="Node" parent="."]

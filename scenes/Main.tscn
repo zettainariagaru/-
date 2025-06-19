@@ -1,423 +1,89 @@
-[gd_scene load_steps=8 format=3 uid="uid://c0jyvqnle44ba"]
+[gd_scene load_steps=12 format=3 uid="uid://c0jyvqnle44ba"]
 
-[ext_resource type="Script" uid="uid://cg02a5ee0cyn0" path="res://scripts/LaneManager.gd" id="1_vcsgt"]
-[ext_resource type="Script" uid="uid://dtns2bhvjnri2" path="res://scripts/Player.gd" id="2_c01mt"]
-[ext_resource type="Script" uid="uid://dr3s6ykpof86m" path="res://scripts/EnemyManager.gd" id="3_nxtc6"]
-[ext_resource type="Script" uid="uid://cd3vqh5exgf6w" path="res://scripts/CameraController.gd" id="4_c01mt"]
-[ext_resource type="Script" uid="uid://bhyt5urd6aaub" path="res://scripts/UI.gd" id="4_jlsqs"]
-[ext_resource type="Script" uid="uid://be2h3pcbwhk77" path="res://scripts/Effects.gd" id="5_nxtc6"]
+[ext_resource type="Script" uid="uid://cdp2f6eebikh6" path="res://scripts/ThreeLaneField.gd" id="3_vcsgt"]
+[ext_resource type="PackedScene" uid="uid://ckb4r4oywxog1" path="res://scenes/Player.tscn" id="4_lhr70"]
+[ext_resource type="Script" uid="uid://omy8sjlq6gn5" path="res://scripts/AudioBusManager.gd" id="4_rarhs"]
+[ext_resource type="Script" uid="uid://cfm5mnj2o3n12" path="res://resources/GimmickPlacement.gd" id="5_jlsqs"]
 [ext_resource type="Script" uid="uid://bortwy4x8m6bg" path="res://scripts/GameManager.gd" id="5_q8u5g"]
+[ext_resource type="PackedScene" uid="uid://c4s311tci4pco" path="res://scenes/Monster.tscn" id="5_wp0k4"]
+[ext_resource type="Script" uid="uid://cay7ate5t1cr0" path="res://scripts/UIManager.gd" id="6_jlsqs"]
+[ext_resource type="Script" uid="uid://dlqfkuygfvdmp" path="res://resources/LevelData.gd" id="6_q8u5g"]
+[ext_resource type="Script" uid="uid://d03o1dgqbixo8" path="res://resources/SpawnWave.gd" id="7_lhr70"]
+[ext_resource type="Script" uid="uid://b533nf5qi3aw1" path="res://scripts/Spawner.gd" id="7_q8u5g"]
+
+[sub_resource type="Resource" id="Resource_wp0k4"]
+script = ExtResource("6_q8u5g")
+level_name = "Level 1"
+level_description = ""
+difficulty = 1
+time_limit = 300.0
+background_layers = Array[Texture2D]([])
+background_speeds = Array[float]([0.2, 0.5, 0.8])
+ambient_color = Color(1, 1, 1, 1)
+spawn_waves = Array[ExtResource("7_lhr70")]([])
+spawn_interval = 2.0
+max_enemies_on_screen = 10
+gimmick_positions = Array[ExtResource("5_jlsqs")]([])
+clear_condition = "defeat_all"
+target_score = 10000
+bonus_objectives = Array[String]([])
+completion_reward = 1000
+time_bonus_multiplier = 2.0
+perfect_clear_bonus = 5000
+metadata/_custom_type_script = "uid://dlqfkuygfvdmp"
 
 [node name="Main" type="Node2D"]
 
-[node name="Game" type="Node2D" parent="."]
-
-[node name="Background" type="Node2D" parent="Game"]
-z_index = -10
-
-[node name="BGColor" type="ColorRect" parent="Game/Background"]
-offset_right = 1280.0
-offset_bottom = 720.0
-color = Color(0.1, 0.1, 0.1, 1)
-
-[node name="GridPattern" type="Node2D" parent="Game/Background"]
-z_index = -9
-
-[node name="@ColorRect@27313" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_right = 1.0
-offset_bottom = 720.0
-
-[node name="@ColorRect@27314" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 32.0
-offset_right = 33.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27315" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 64.0
-offset_right = 65.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27316" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 96.0
-offset_right = 97.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27317" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 128.0
-offset_right = 129.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27318" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 160.0
-offset_right = 161.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27319" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 192.0
-offset_right = 193.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27320" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 224.0
-offset_right = 225.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27321" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 256.0
-offset_right = 257.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27322" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 288.0
-offset_right = 289.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27323" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 320.0
-offset_right = 321.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27324" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 352.0
-offset_right = 353.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27325" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 384.0
-offset_right = 385.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27326" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 416.0
-offset_right = 417.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27327" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 448.0
-offset_right = 449.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27328" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 480.0
-offset_right = 481.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27329" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 512.0
-offset_right = 513.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27330" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 544.0
-offset_right = 545.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27331" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 576.0
-offset_right = 577.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27332" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 608.0
-offset_right = 609.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27333" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 640.0
-offset_right = 641.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27334" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 672.0
-offset_right = 673.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27335" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 704.0
-offset_right = 705.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27336" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 736.0
-offset_right = 737.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27337" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 768.0
-offset_right = 769.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27338" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 800.0
-offset_right = 801.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27339" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 832.0
-offset_right = 833.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27340" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 864.0
-offset_right = 865.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27341" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 896.0
-offset_right = 897.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27342" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 928.0
-offset_right = 929.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27343" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 960.0
-offset_right = 961.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27344" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 992.0
-offset_right = 993.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27345" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 1024.0
-offset_right = 1025.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27346" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 1056.0
-offset_right = 1057.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27347" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 1088.0
-offset_right = 1089.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27348" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 1120.0
-offset_right = 1121.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27349" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 1152.0
-offset_right = 1153.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27350" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 1184.0
-offset_right = 1185.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27351" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 1216.0
-offset_right = 1217.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27352" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_left = 1248.0
-offset_right = 1249.0
-offset_bottom = 720.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27353" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_right = 1280.0
-offset_bottom = 1.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27354" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 32.0
-offset_right = 1280.0
-offset_bottom = 33.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27355" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 64.0
-offset_right = 1280.0
-offset_bottom = 65.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27356" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 96.0
-offset_right = 1280.0
-offset_bottom = 97.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27357" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 128.0
-offset_right = 1280.0
-offset_bottom = 129.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27358" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 160.0
-offset_right = 1280.0
-offset_bottom = 161.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27359" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 192.0
-offset_right = 1280.0
-offset_bottom = 193.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27360" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 224.0
-offset_right = 1280.0
-offset_bottom = 225.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27361" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 256.0
-offset_right = 1280.0
-offset_bottom = 257.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27362" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 288.0
-offset_right = 1280.0
-offset_bottom = 289.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27363" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 320.0
-offset_right = 1280.0
-offset_bottom = 321.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27364" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 352.0
-offset_right = 1280.0
-offset_bottom = 353.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27365" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 384.0
-offset_right = 1280.0
-offset_bottom = 385.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27366" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 416.0
-offset_right = 1280.0
-offset_bottom = 417.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27367" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 448.0
-offset_right = 1280.0
-offset_bottom = 449.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27368" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 480.0
-offset_right = 1280.0
-offset_bottom = 481.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27369" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 512.0
-offset_right = 1280.0
-offset_bottom = 513.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27370" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 544.0
-offset_right = 1280.0
-offset_bottom = 545.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27371" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 576.0
-offset_right = 1280.0
-offset_bottom = 577.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27372" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 608.0
-offset_right = 1280.0
-offset_bottom = 609.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27373" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 640.0
-offset_right = 1280.0
-offset_bottom = 641.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27374" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 672.0
-offset_right = 1280.0
-offset_bottom = 673.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="@ColorRect@27375" type="ColorRect" parent="Game/Background/GridPattern"]
-offset_top = 704.0
-offset_right = 1280.0
-offset_bottom = 705.0
-color = Color(0.15, 0.15, 0.15, 1)
-
-[node name="Lanes" type="Node2D" parent="Game"]
-script = ExtResource("1_vcsgt")
-
-[node name="Player" type="CharacterBody2D" parent="Game"]
-position = Vector2(128, 200)
-script = ExtResource("2_c01mt")
-
-[node name="Enemies" type="Node2D" parent="Game"]
-script = ExtResource("3_nxtc6")
-
-[node name="Camera" type="Camera2D" parent="Game"]
-position = Vector2(640, 260)
-script = ExtResource("4_c01mt")
-
-[node name="Effects" type="Node2D" parent="Game"]
-z_index = 5
-script = ExtResource("5_nxtc6")
-
-[node name="UI" type="CanvasLayer" parent="."]
-script = ExtResource("4_jlsqs")
-
 [node name="GameManager" type="Node" parent="."]
 script = ExtResource("5_q8u5g")
+
+[node name="UIManager" type="CanvasLayer" parent="."]
+script = ExtResource("6_jlsqs")
+
+[node name="HUD" type="Control" parent="UIManager"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="StackUI" type="Control" parent="UIManager"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="ComboVFX" type="Control" parent="UIManager"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="PauseMenu" type="Control" parent="UIManager"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Field" type="Node2D" parent="."]
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="Field"]
+
+[node name="TileMap" type="TileMap" parent="Field"]
+format = 2
+script = ExtResource("3_vcsgt")
+
+[node name="YSort" type="Node2D" parent="Field"]
+y_sort_enabled = true
+
+[node name="Gimmicks" type="Node2D" parent="Field/YSort"]
+
+[node name="Entities" type="Node2D" parent="Field/YSort"]
+
+[node name="Player" parent="Field/YSort/Entities" instance=ExtResource("4_lhr70")]
+
+[node name="Monster" parent="Field/YSort/Entities" instance=ExtResource("5_wp0k4")]
+
+[node name="ThrownObjects" type="Node2D" parent="Field/YSort"]
+
+[node name="Spawner" type="Node" parent="Field"]
+script = ExtResource("7_q8u5g")
+level_data = SubResource("Resource_wp0k4")
+
+[node name="CameraRig" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="CameraRig"]
+
+[node name="AudioBusManager" type="Node" parent="."]
+script = ExtResource("4_rarhs")

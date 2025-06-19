@@ -1,295 +1,308 @@
 extends CharacterBody2D
 
-# 状態
-enum State { IDLE, MOVING, HIT, DEAD }
+# プレイヤーの動作制御スクリプト（タイルベース移動対応）
 
-# 設定
-const MOVE_SPEED: float = 500.0
-const INVULNERABLE_TIME: float = 1.5
-const PLAYER_SIZE: Vector2 = Vector2(56, 56)  # タイルより少し小さく
+# 基本パラメータ
+@export_group("Movement")
+@export var move_speed: float = 300.0  # タイル間の移動速度
+@export var tile_based_movement: bool = true  # タイルベース移動の有効/無効
 
-# 状態変数
-var state: State = State.IDLE
-var tile_x: int = 2
-var lane: int = 1
-var target_pos: Vector2
+@export_group("Throwing")
+@export var throw_power: float = 600.0
+@export var max_throw_distance: float = 400.0
+@export var aim_rotation_speed: float = 5.0
+
+@export_group("Stats")
+@export var max_health: int = 100
+@export var max_carry_stack: int = 5
+
+# タイルベース移動用
+var current_tile: Vector2i = Vector2i(5, 1)  # 開始位置（中央レーン）
+var target_position: Vector2 = Vector2.ZERO
+var is_moving: bool = false
+var move_cooldown: float = 0.0
+const MOVE_COOLDOWN_TIME: float = 0.15  # 移動間のクールダウン
+
+# 内部変数
+var current_health: int
+var carried_monsters: Array[MonsterData] = []
+var is_aiming: bool = false
+var aim_direction: Vector2 = Vector2.RIGHT
+var can_pick_up: bool = true
 var invulnerable: bool = false
 
-# 移動制御
-var move_cooldown: float = 0.0
-const MOVE_COOLDOWN_TIME: float = 0.1
+# ノード参照
+@onready var sprite: AnimatedSprite2D = $Sprite
+@onready var state_machine: Node = $StateMachine
+@onready var carry_stack: Node2D = $CarryStack
+@onready var throw_guide: Line2D = $ThrowGuide
+@onready var pick_range: Area2D = $PickRange
+@onready var hurtbox: Area2D = $Hurtbox
 
-# コンポーネント
-var sprite: Sprite2D
-var collision: CollisionShape2D
-var area: Area2D
-var shadow: Sprite2D
+# タイルマップ参照
+var tilemap: TileMap
 
-# シグナル
-signal hit()
-signal moved(new_tile_x, new_lane)
-signal tile_entered(tile_x, lane)
+func _ready() -> void:
+	current_health = max_health
+	_setup_connections()
+	_initialize_state_machine()
+	
+	# タイルマップを取得
+	tilemap = get_tree().current_scene.get_node("Field/TileMap")
+	if tilemap and tile_based_movement:
+		# 開始位置を設定
+		target_position = tilemap.get_tile_center_position(current_tile)
+		global_position = target_position
+	
+func _setup_connections() -> void:
+	# Area2Dのシグナル接続
+	pick_range.body_entered.connect(_on_pick_range_body_entered)
+	pick_range.body_exited.connect(_on_pick_range_body_exited)
+	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
+	
+	# EventBusへの接続
+	if has_node("/root/EventBus"):
+		var event_bus = get_node("/root/EventBus")
+		event_bus.game_state_changed.connect(_on_game_state_changed)
 
-func _ready():
-	# コンポーネントを作成
-	_create_components()
-	
-	# 初期位置設定
-	reset_position()
+func _initialize_state_machine() -> void:
+	# ステートマシンの初期化（実装は別途）
+	pass
 
-func _create_components():
-	# 影を作成
-	shadow = Sprite2D.new()
-	shadow.name = "Shadow"
-	shadow.z_index = -1
-	add_child(shadow)
-	
-	# 影のテクスチャ
-	var shadow_image = Image.create(60, 60, false, Image.FORMAT_RGBA8)
-	for x in range(60):
-		for y in range(60):
-			var dist = Vector2(x - 30, y - 30).length()
-			if dist < 28:
-				var alpha = 0.3 * (1.0 - dist / 28.0)
-				shadow_image.set_pixel(x, y, Color(0, 0, 0, alpha))
-	shadow.texture = ImageTexture.create_from_image(shadow_image)
-	shadow.position = Vector2(4, 4)
-	
-	# スプライト作成
-	sprite = Sprite2D.new()
-	sprite.name = "Sprite"
-	add_child(sprite)
-	
-	# 白い四角形のテクスチャ作成
-	var image = Image.create(int(PLAYER_SIZE.x), int(PLAYER_SIZE.y), false, Image.FORMAT_RGBA8)
-	
-	for x in range(int(PLAYER_SIZE.x)):
-		for y in range(int(PLAYER_SIZE.y)):
-			# ベースは白
-			var color = Color.WHITE
-			
-			# 外枠（1ピクセル）
-			if x == 0 or x == PLAYER_SIZE.x - 1 or y == 0 or y == PLAYER_SIZE.y - 1:
-				color = Color(0.7, 0.7, 0.7)
-			# 2層目の枠
-			elif x == 1 or x == PLAYER_SIZE.x - 2 or y == 1 or y == PLAYER_SIZE.y - 2:
-				color = Color(0.85, 0.85, 0.85)
-			# 3層目の枠
-			elif x == 2 or x == PLAYER_SIZE.x - 3 or y == 2 or y == PLAYER_SIZE.y - 3:
-				color = Color(0.92, 0.92, 0.92)
-			# 内側のハイライト
-			elif x == 3 or x == PLAYER_SIZE.x - 4 or y == 3 or y == PLAYER_SIZE.y - 4:
-				color = Color(0.98, 0.98, 0.98)
-			
-			image.set_pixel(x, y, color)
-	
-	# 中央に小さな四角を追加（プレイヤーの向きを示す）
-	var center_x = int(PLAYER_SIZE.x / 2)
-	var center_y = int(PLAYER_SIZE.y / 2)
-	for x in range(-4, 5):
-		for y in range(-4, 5):
-			if abs(x) <= 3 and abs(y) <= 3:
-				var px = center_x + x
-				var py = center_y + y - 10  # 上寄りに配置
-				if px >= 0 and px < PLAYER_SIZE.x and py >= 0 and py < PLAYER_SIZE.y:
-					image.set_pixel(px, py, Color(0.8, 0.8, 0.8))
-	
-	sprite.texture = ImageTexture.create_from_image(image)
-	
-	# コリジョン作成
-	collision = CollisionShape2D.new()
-	collision.name = "Collision"
-	var shape = RectangleShape2D.new()
-	shape.size = PLAYER_SIZE * 0.9
-	collision.shape = shape
-	add_child(collision)
-	
-	# ヒットエリア作成
-	area = Area2D.new()
-	area.name = "HitArea"
-	area.collision_layer = 2
-	area.collision_mask = 4
-	add_child(area)
-	
-	var area_col = CollisionShape2D.new()
-	var area_shape = RectangleShape2D.new()
-	area_shape.size = PLAYER_SIZE * 0.8
-	area_col.shape = area_shape
-	area.add_child(area_col)
-	
-	# シグナル接続
-	area.connect("area_entered", _on_area_entered)
-
-func _physics_process(delta):
-	# クールダウン処理
+func _physics_process(delta: float) -> void:
+	# クールダウンを更新
 	if move_cooldown > 0:
 		move_cooldown -= delta
 	
-	match state:
-		State.IDLE:
-			_handle_input()
-		State.MOVING:
-			_update_movement(delta)
-
-func _handle_input():
-	# クールダウン中は入力を受け付けない
-	if move_cooldown > 0:
-		return
-	
-	# 移動入力の優先順位を設定
-	var input_vector = Vector2.ZERO
-	
-	# 左右移動（タイル移動）
-	if Input.is_action_pressed("ui_right"):
-		input_vector.x = 1
-	elif Input.is_action_pressed("ui_left"):
-		input_vector.x = -1
-	
-	# 上下移動（レーン変更）
-	if Input.is_action_pressed("ui_up"):
-		input_vector.y = -1
-	elif Input.is_action_pressed("ui_down"):
-		input_vector.y = 1
-	
-	# 入力があれば移動を試みる
-	if input_vector != Vector2.ZERO:
-		if input_vector.x != 0:
-			try_move(tile_x + int(input_vector.x), lane)
-		elif input_vector.y != 0:
-			try_move(tile_x, lane + int(input_vector.y))
-
-func try_move(new_tile_x: int, new_lane: int):
-	var tile_system = get_node_or_null("/root/TileSystem")
-	if not tile_system:
-		push_error("TileSystem not found!")
-		return
-	
-	# 移動可能かチェック
-	var can_move = false
-	
-	# 横移動の場合
-	if new_lane == lane:
-		if tile_system.is_valid_tile(new_tile_x):
-			can_move = true
-	# レーン変更の場合
-	elif new_tile_x == tile_x:
-		if tile_system.can_change_lane(lane, new_lane):
-			can_move = true
-	
-	# 移動実行
-	if can_move:
-		move_to(new_tile_x, new_lane)
-		move_cooldown = MOVE_COOLDOWN_TIME
-
-func move_to(new_tile_x: int, new_lane: int):
-	var tile_system = get_node_or_null("/root/TileSystem")
-	if not tile_system:
-		return
-	
-	# 移動前の位置を記録
-	var old_tile_x = tile_x
-	var old_lane = lane
-	
-	tile_x = new_tile_x
-	lane = new_lane
-	target_pos = tile_system.tile_to_world(tile_x, lane)
-	state = State.MOVING
-	
-	# 移動方向に応じてスプライトを少し傾ける
-	if sprite:
-		var tween = create_tween()
-		if new_tile_x > old_tile_x:  # 右移動
-			tween.tween_property(sprite, "rotation", 0.05, 0.1)
-			tween.tween_property(sprite, "rotation", 0.0, 0.1)
-		elif new_tile_x < old_tile_x:  # 左移動
-			tween.tween_property(sprite, "rotation", -0.05, 0.1)
-			tween.tween_property(sprite, "rotation", 0.0, 0.1)
-		elif new_lane < old_lane:  # 上移動
-			tween.tween_property(sprite, "scale", Vector2(1.0, 1.1), 0.1)
-			tween.tween_property(sprite, "scale", Vector2.ONE, 0.1)
-		elif new_lane > old_lane:  # 下移動
-			tween.tween_property(sprite, "scale", Vector2(1.0, 0.9), 0.1)
-			tween.tween_property(sprite, "scale", Vector2.ONE, 0.1)
-	
-	emit_signal("moved", tile_x, lane)
-	
-	# タイルをハイライト
-	var lanes = get_node_or_null("../../Lanes")
-	if lanes and lanes.has_method("animate_tile"):
-		lanes.animate_tile(tile_x, lane)
-
-func _update_movement(_delta):
-	var distance = position.distance_to(target_pos)
-	if distance < 2.0:
-		position = target_pos
-		velocity = Vector2.ZERO
-		state = State.IDLE
-		emit_signal("tile_entered", tile_x, lane)
+	if is_aiming:
+		_update_aim(delta)
+		_update_throw_guide()
+	elif tile_based_movement and tilemap:
+		_handle_tile_based_movement(delta)
 	else:
-		var direction = (target_pos - position).normalized()
-		velocity = direction * MOVE_SPEED
-		move_and_slide()
+		_handle_free_movement(delta)
+	
+	move_and_slide()
 
-func reset_position():
-	var tile_system = get_node_or_null("/root/TileSystem")
-	if tile_system:
-		tile_x = 2
-		lane = 1
-		position = tile_system.tile_to_world(tile_x, lane)
-		target_pos = position
-		state = State.IDLE
-		invulnerable = false
-		move_cooldown = 0
+func _handle_tile_based_movement(delta: float) -> void:
+	var input_vector = Vector2i.ZERO
+	
+	# 入力を取得（移動中でなく、クールダウンが終わっている場合のみ）
+	if not is_moving and move_cooldown <= 0:
+		if Input.is_action_pressed("move_right"):
+			input_vector.x = 1
+		elif Input.is_action_pressed("move_left"):
+			input_vector.x = -1
+		elif Input.is_action_pressed("move_down"):  # レーン変更（下へ）
+			input_vector.y = 1
+		elif Input.is_action_pressed("move_up"):    # レーン変更（上へ）
+			input_vector.y = -1
+		
+		# 入力があれば移動を開始
+		if input_vector != Vector2i.ZERO:
+			var new_tile = current_tile + input_vector
+			
+			# タイルが有効範囲内かチェック
+			if tilemap.is_valid_tile(new_tile):
+				current_tile = new_tile
+				target_position = tilemap.get_tile_center_position(current_tile)
+				is_moving = true
+				move_cooldown = MOVE_COOLDOWN_TIME
+				
+				# アニメーション更新
+				if input_vector.x != 0:
+					sprite.flip_h = input_vector.x < 0
+	
+	# スムーズな移動
+	if is_moving:
+		global_position = global_position.move_toward(target_position, move_speed * delta)
+		sprite.play("run")
+		
+		# 目標位置に到達したかチェック
+		if global_position.distance_to(target_position) < 1.0:
+			global_position = target_position
+			is_moving = false
+	else:
+		sprite.play("idle")
 
-func take_damage():
-	if invulnerable or state == State.DEAD:
+func _handle_free_movement(delta: float) -> void:
+	var input_vector = Vector2.ZERO
+	input_vector.x = Input.get_axis("move_left", "move_right")
+	input_vector.y = Input.get_axis("move_up", "move_down")
+	input_vector = input_vector.normalized()
+	
+	if input_vector != Vector2.ZERO:
+		velocity = input_vector * move_speed
+		sprite.play("run")
+		sprite.flip_h = velocity.x < 0
+	else:
+		velocity = Vector2.ZERO
+		sprite.play("idle")
+
+func _update_aim(delta: float) -> void:
+	# マウスまたは右スティックで狙いを定める
+	var mouse_pos = get_global_mouse_position()
+	var target_direction = (mouse_pos - global_position).normalized()
+	aim_direction = aim_direction.lerp(target_direction, aim_rotation_speed * delta)
+
+func _update_throw_guide() -> void:
+	if carried_monsters.is_empty():
+		throw_guide.visible = false
+		return
+		
+	throw_guide.visible = true
+	throw_guide.clear_points()
+	
+	# 投擲軌道の計算
+	var points: Array[Vector2] = []
+	var start_pos = Vector2.ZERO
+	var velocity = aim_direction * throw_power
+	var gravity = 980.0 # 重力加速度
+	var time_step = 0.05
+	
+	for i in range(20): # 20ポイントで軌道を表示
+		var t = i * time_step
+		var x = velocity.x * t
+		var y = velocity.y * t + 0.5 * gravity * t * t
+		points.append(Vector2(x, y))
+		
+		if points[i].length() > max_throw_distance:
+			break
+	
+	throw_guide.points = points
+
+func _input(event: InputEvent) -> void:
+	# 投げる動作
+	if event.is_action_pressed("throw") and not carried_monsters.is_empty():
+		is_aiming = true
+		is_moving = false  # タイルベース移動を中断
+		sprite.play("aim")
+	elif event.is_action_released("throw") and is_aiming:
+		_throw_monster()
+		is_aiming = false
+	
+	# 拾う動作
+	if event.is_action_pressed("pick_up") and can_pick_up:
+		_try_pick_up_monster()
+
+func _throw_monster() -> void:
+	if carried_monsters.is_empty():
 		return
 	
-	state = State.HIT
+	var monster_data = carried_monsters.pop_back()
+	var thrown_position = global_position + aim_direction * 50
+	
+	# EventBusを通じて投擲イベントを発信
+	if has_node("/root/EventBus"):
+		var event_bus = get_node("/root/EventBus")
+		event_bus.monster_thrown.emit(monster_data, global_position, thrown_position)
+	
+	# 投擲物の生成（ObjectPoolsを使用）
+	if has_node("/root/ObjectPools"):
+		var object_pools = get_node("/root/ObjectPools")
+		var projectile = object_pools.get_projectile("thrown_monster")
+		if projectile:
+			projectile.setup(monster_data, thrown_position, aim_direction * throw_power)
+			get_tree().current_scene.get_node("Field/YSort/ThrownObjects").add_child(projectile)
+	
+	_update_carry_stack_display()
+	sprite.play("throw")
+
+func _try_pick_up_monster() -> void:
+	if carried_monsters.size() >= max_carry_stack:
+		return
+	
+	# 範囲内のモンスターを探す
+	var bodies = pick_range.get_overlapping_bodies()
+	for body in bodies:
+		if body.has_method("can_be_picked_up") and body.can_be_picked_up():
+			_pick_up_monster(body)
+			break
+
+func _pick_up_monster(monster: Node) -> void:
+	if not monster.has_method("get_monster_data"):
+		return
+		
+	var monster_data = monster.get_monster_data()
+	carried_monsters.append(monster_data)
+	monster.queue_free()
+	
+	_update_carry_stack_display()
+	
+	if has_node("/root/EventBus"):
+		var event_bus = get_node("/root/EventBus")
+		event_bus.effect_requested.emit("pick_up", monster.global_position)
+
+func _update_carry_stack_display() -> void:
+	# スタック表示の更新
+	for child in carry_stack.get_children():
+		child.queue_free()
+	
+	var stack_offset = Vector2(0, -20)
+	for i in range(carried_monsters.size()):
+		var stack_sprite = Sprite2D.new()
+		# ここでモンスターのスプライトを設定
+		stack_sprite.position = stack_offset * i
+		carry_stack.add_child(stack_sprite)
+	
+	# UIの更新
+	if has_node("/root/EventBus"):
+		var event_bus = get_node("/root/EventBus")
+		event_bus.combo_updated.emit(carried_monsters.size())
+
+func take_damage(amount: int) -> void:
+	if invulnerable:
+		return
+		
+	current_health = max(0, current_health - amount)
+	
+	if has_node("/root/EventBus"):
+		var event_bus = get_node("/root/EventBus")
+		event_bus.player_health_changed.emit(current_health)
+	
+	if current_health <= 0:
+		_die()
+	else:
+		_start_invulnerability()
+
+func _start_invulnerability() -> void:
 	invulnerable = true
-	emit_signal("hit")
+	sprite.modulate.a = 0.5
 	
-	# ダメージエフェクト
-	_damage_effect()
+	await get_tree().create_timer(1.0).timeout
 	
-	# 無敵時間
-	await get_tree().create_timer(INVULNERABLE_TIME).timeout
 	invulnerable = false
-	if state == State.HIT:
-		state = State.IDLE
+	sprite.modulate.a = 1.0
 
-func _damage_effect():
-	if not sprite:
-		return
-	
-	# 赤くフラッシュ
-	var original_modulate = sprite.modulate
-	var tween = create_tween()
-	
-	for i in range(5):
-		tween.tween_property(sprite, "modulate", Color(1, 0.3, 0.3, 0.5), 0.1)
-		tween.tween_property(sprite, "modulate", original_modulate, 0.1)
-	
-	# ノックバック演出
-	var knockback_tween = create_tween()
-	knockback_tween.tween_property(sprite, "position:x", -10, 0.05)
-	knockback_tween.tween_property(sprite, "position:x", 0, 0.1)
+func _die() -> void:
+	if has_node("/root/EventBus"):
+		var event_bus = get_node("/root/EventBus")
+		event_bus.game_state_changed.emit("game_over")
+	queue_free()
 
-func _on_area_entered(other_area: Area2D):
-	if other_area.is_in_group("enemy"):
-		take_damage()
-
-func get_current_position() -> Dictionary:
-	return {"tile_x": tile_x, "lane": lane}
-
-func get_available_moves() -> Dictionary:
-	var tile_system = get_node_or_null("/root/TileSystem")
-	if not tile_system:
-		return {}
-	
+# 現在のタイル情報を取得
+func get_current_tile_info() -> Dictionary:
+	if not tilemap:
+		return {"tile": Vector2i.ZERO, "lane": -1}
+		
 	return {
-		"can_move_right": tile_system.is_valid_tile(tile_x + 1),
-		"can_move_left": tile_system.is_valid_tile(tile_x - 1),
-		"can_move_up": tile_system.can_change_lane(lane, lane - 1),
-		"can_move_down": tile_system.can_change_lane(lane, lane + 1)
+		"tile": current_tile,
+		"lane": current_tile.y,
+		"position_in_lane": current_tile.x
 	}
+
+# シグナルコールバック
+func _on_pick_range_body_entered(body: Node2D) -> void:
+	if body.has_method("highlight"):
+		body.highlight(true)
+
+func _on_pick_range_body_exited(body: Node2D) -> void:
+	if body.has_method("highlight"):
+		body.highlight(false)
+
+func _on_hurtbox_area_entered(area: Area2D) -> void:
+	if area.has_method("get_damage"):
+		take_damage(area.get_damage())
+
+func _on_game_state_changed(new_state: String) -> void:
+	set_physics_process(new_state == "playing")
